@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Likes Trend</title>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase.js"></script>
+  <script>
+    var config = {
+        apiKey: "AIzaSyA3F6WJEYeiMNYEHl5_ldLBSUP4BZLJU_k",
+        authDomain: "ces-17.firebaseapp.com",
+        databaseURL: "https://ces-17.firebaseio.com",
+        storageBucket: "ces-17.appspot.com",
+        messagingSenderId: "121146090505"
+    };
+    firebase.initializeApp(config);
+  </script>
+</head>
+<body>
+  <canvas id="myChart1" width="500" height="500"></canvas>
+  <canvas id="myChart2" width="500" height="500"></canvas>
+  <script>
+    var ctx = document.getElementById("myChart1");
+    var option = {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    max: 100,
+                    min: 0,
+                    stepSize: 10
+                }
+            }]
+        }
+    };
+    var data1 = {
+      labels: [],
+      datasets: [{data: [],label: "Temperature",backgroundColor: "rgba(251, 75, 75,1)"}]
+    }
+    var myLineChart = new Chart(ctx, {
+      type: "line",
+      data: data1,
+      options: option
+    });
+    firebase.database().ref('tempary').once('value').then(function(snapshot) {
+      var labels = [];
+        for(var x; x < snapshot.val().length; x++){
+          labels[x] = x;
+        }
+        myLineChart.data.datasets[0].data = snapshot.val();
+        myLineChart.data.labels = labels;
+    });
+    var ctx2 = document.getElementById("myChart2");
+    var data2 = {
+      labels: [],
+      datasets: [{data: [],label: "Humidity",backgroundColor: "rgba(75, 251, 251,1)"}]
+    }
+    var myLineChart2 = new Chart(ctx2, {
+      type: "line",
+      data: data2,
+      options: option
+    });
+    firebase.database().ref('tempary').once('value').then(function(snapshot) {
+      var labels = [];
+        for(var x; x < snapshot.val().length; x++){
+          labels[x] = x;
+        }
+        myLineChart2.data.datasets[0].data = snapshot.val();
+        myLineChart2.data.labels = labels;
+    });
+  </script>
+  <script>
+    var tempCountRef = firebase.database().ref("tempary");
+    tempCountRef.on("value", function(snapshot) {
+      if(snapshot != null){
+        console.log(snapshot.val());
+        var labels = [];
+        for(var x; x < snapshot.val().length; x++){
+          labels[x] = x;
+        }
+        myLineChart.data.datasets[0].data = snapshot.val();
+        myLineChart.data.labels = labels;
+                console.log("myLineChart.data.datasets[0].data"+myLineChart.data.datasets[0].data);
+
+      }
+    });
+    //---------------------------------------------------
+    var humCountRef = firebase.database().ref("humary");
+    humCountRef.on("value", function(snapshot) {
+      if(snapshot != null){
+        console.log(snapshot.val());
+        var labels = [];
+        for(var x; x < snapshot.val().length; x++){
+          labels[x] = x;
+        }
+        myLineChart2.data.datasets[0].data = snapshot.val();
+        myLineChart2.data.labels = labels;
+        console.log("myLineChart2.data.datasets[0].data"+myLineChart2.data.datasets[0].data);
+      }
+    });
+  </script>
+</body>
